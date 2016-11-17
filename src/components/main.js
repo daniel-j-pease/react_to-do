@@ -1,5 +1,5 @@
-import App from './App/App.jsx';
 import ReactDOM from 'react-dom';
+import App from './App/App.jsx';
 
 require('bootstrap/dist/css/bootstrap.css');
 require('./App/styles.css');
