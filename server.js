@@ -1,32 +1,30 @@
-/* eslint no-multi-spaces: ["error", { exceptions: { "VariableDeclarator": true } }] */
-/* eslint import/no-extraneous-dependencies: ["error", {"devDependencies": true}] */
-/* eslint strict: ["error", {"global": true}] */
-
 'use strict';
 
-// regular stuff
 const express     = require('express');
 const bodyParser  = require('body-parser');
 const logger      = require('morgan');
+const path        = require('path');
+const favicon     = require('serve-favicon');
 
-// This tests to see if we have NODE_ENV in our environment.
-// Only load the dotenv if we need it.
 const isDev       = !('NODE_ENV' in process.env) && require('dotenv').config() && true;
 
 const app         = express();
-const PORT        = process.argv[2] || process.env.port || 3000;
 
-// set up some logging
 app.use(logger(isDev ? 'dev' : 'common'));
-
-// we're only going to accept json
 app.use(bodyParser.json());
+app.use(favicon(__dirname + '/public/images/favicon.ico'));
 
+const PORT = process.argv[2] || process.env.PORT || 3000;
+
+const indexRoute   = require('./routes/index');
+const tasksRoute   = require('./routes/tasks');
+
+app.use('/', indexRoute);
+app.use('/tasks', tasksRoute);
+
+// generic error handling
 app.use((err, req, res, next) => {
-  res.status(500).send('Something broke!', next);
+  res.status(500).send('Something broke!').end(next);
 });
 
-// Let's go!
-app.listen(PORT, () => {
-  console.log(process.env, isDev);
-});
+app.listen(PORT, () => console.log(`running on port ${PORT}`));
